@@ -123,7 +123,35 @@ class ConvE(torch.nn.Module):
 
         return pred
 
+  class TuckER(torch.nn.Module):
+    def __init__(self, args, num_entities, num_relations):
+        super(TuckER, self).__init__()
+        self.emb_e = torch.nn.Embedding(num_entities, args.embedding_dim, padding_idx=0)
+        self.emb_rel = torch.nn.Embedding(num_relations, args.embedding_dim, padding_idx=0)
+        self.W = torch.nn.Parameter(torch.tensor(np.random.uniform(-1, 1, (args.embedding_dim, args.embedding_dim, args.embedding_dim)), 
+                                    dtype=torch.float, device="cuda", requires_grad=True))
+        self.inp_drop = torch.nn.Dropout(args.input_drop)
+        self.loss = torch.nn.BCELoss()
 
+    def init(self):
+        xavier_normal_(self.emb_e.weight.data)
+        xavier_normal_(self.emb_rel.weight.data)
+
+
+    def forward(self, e1_idx, r_idx):
+        e1 = self.emb_e(e1_idx)
+        x = self.inp_drop(e1)
+        r = self.emb_rel(r_idx).squeeze()
+        W_mat = torch.mm(r, self.W.view(r.size(1), -1))
+        W_mat = W_mat.view(-1, e1.size(-1), e1.size(-1))
+        W_mat = self.inp_drop(W_mat)
+        x = torch.bmm(x, W_mat).squeeze()
+        x = self.inp_drop(x)
+        x = torch.mm(x, self.emb_e.weight.transpose(1,0))
+        pred = torch.sigmoid(x)
+        return pred
+
+    
 # Add your own model here
 
 class MyModel(torch.nn.Module):
