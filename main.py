@@ -11,7 +11,7 @@ from os.path import join
 import torch.backends.cudnn as cudnn
 
 from evaluation import ranking_and_hits
-from model import ConvE, DistMult, Complex
+from model import ConvE, DistMult, Complex, TuckER
 
 from spodernet.preprocessing.pipeline import Pipeline, DatasetStreamer
 from spodernet.preprocessing.processors import JsonLoaderProcessors, Tokenizer, AddToVocab, SaveLengthsToState, StreamToHDF5, SaveMaxLengthsToState, CustomTokenizer
@@ -95,6 +95,8 @@ def main(args, model_path):
         model = DistMult(args, vocab['e1'].num_token, vocab['rel'].num_token)
     elif args.model == 'complex':
         model = Complex(args, vocab['e1'].num_token, vocab['rel'].num_token)
+    elif args.model == 'tucker':
+        model = TuckER(args, vocab['e1'].num_token, vocab['rel'].num_token)
     else:
         log.info('Unknown model: {0}', args.model)
         raise Exception("Unknown model!")
