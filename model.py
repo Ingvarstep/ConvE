@@ -123,13 +123,13 @@ class ConvE(torch.nn.Module):
 
         return pred
 
-  class TuckER(torch.nn.Module):
+class TuckER(torch.nn.Module):
     def __init__(self, args, num_entities, num_relations):
         super(TuckER, self).__init__()
         self.emb_e = torch.nn.Embedding(num_entities, args.embedding_dim, padding_idx=0)
         self.emb_rel = torch.nn.Embedding(num_relations, args.embedding_dim, padding_idx=0)
-        self.W = torch.nn.Parameter(torch.rand(args.embedding_dim, args.embedding_dim, args.embedding_dim)), 
-                                    dtype=torch.float, device="cuda", requires_grad=True))
+        self.W = torch.nn.Parameter(torch.rand(args.embedding_dim, args.embedding_dim, args.embedding_dim), 
+                                    dtype=torch.float, device="cuda", requires_grad=True)
         self.inp_drop = torch.nn.Dropout(args.input_drop)
         self.loss = torch.nn.BCELoss()
 
